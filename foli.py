@@ -1,14 +1,14 @@
 import requests
 from datetime import datetime
 from tkinter import Tk,ttk
-dt = datetime.now()
-dt.microsecond
 s = requests.Session()
 w = Tk()
 w2 = Tk()
 def foli(x):
 	dt = datetime.now()
-	a = s.get(f'https://data.foli.fi/siri/sm/{x}').json()
+	a = s.get(f'https://data.foli.fi/siri/sm/{x}')
+	a.raise_for_status()
+	a = a.json()
 	r = []
 	for i in range(3):
 		b = datetime.fromtimestamp(a['result'][i]['expectedarrivaltime'])
@@ -17,15 +17,17 @@ def foli(x):
 		l = a['result'][i]['lineref']
 		r.append((l,d))
 	return r
-l = [ttk.Label(master=w2,text="",font=("Liberation Sans",25)) for i in range(3)]
+table = ttk.Label(master=w2, font="Cantarell 25")
 def output(x):
 	w.destroy()
 	update(x)
 def update(x):
 	f = foli(x)
+	table_text=""
 	for i in range(3):
-		l[i].config(text=f"{f[i][0]} : {f[i][1]}")
-		l[i].pack()
+		table_text+=f"{f[i][0]} : {f[i][1]}\n"
+	table.config(text=table_text)
+	table.pack()
 	w2.after(60000,update,x)
 def start(w):
 	l1 = ttk.Label(master=w,text="Give bus stop id.")
